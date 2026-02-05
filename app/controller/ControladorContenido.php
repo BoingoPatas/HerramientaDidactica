@@ -199,15 +199,22 @@ class ContentController {
     }
 
     private function handleContentPost() {
+        error_log("=== INICIANDO handleContentPost ===");
+        error_log("Rol en sesión: " . ($_SESSION['rol'] ?? 'NO HAY ROL'));
+        
         // Verificar permisos de docente/administrador
         $rol = $_SESSION['rol'] ?? '';
+        error_log("Rol obtenido: $rol");
+        
         if (!in_array($rol, ['Docente', 'Administrador'])) {
+            error_log("ERROR: Permisos insuficientes. Rol: $rol");
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Permisos insuficientes']);
             return;
         }
 
         $input = json_decode(file_get_contents('php://input'), true);
+        error_log("Input recibido: " . print_r($input, true));
 
         if (!isset($input['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $input['csrf_token'])) {
             http_response_code(403);
@@ -337,6 +344,24 @@ class ContentController {
 
         $id = $input['id'] ?? null;
         $orden = $input['orden'] ?? null;
+        $activo = $input['activo'] ?? null; // Nuevo: aceptar campo activo
+
+        // Si estamos cambiando el estado activo
+        if ($id && $activo !== null) {
+            require_once 'app/model/ModeloUnidad.php';
+            $unitModel = new ModeloUnidad($this->db);
+            
+            // Actualizar el estado activo de la unidad
+            $success = $unitModel->updateUnitActiveStatus((int)$id, (int)$activo);
+            
+            if ($success) {
+                Registrador::log($_SESSION['usuario'], $_SESSION['rol'], 'unidad_estado_cambiado', "ID: $id, Activo: $activo");
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Error actualizando estado de unidad']);
+            }
+            return;
+        }
 
         // Validar parámetros requeridos
         if (!$id || $orden === null) {

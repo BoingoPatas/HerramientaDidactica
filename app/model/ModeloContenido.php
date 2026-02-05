@@ -153,7 +153,7 @@ class ContentModel {
         // Validar que la unidad existe
         require_once __DIR__ . '/ModeloUnidad.php';
         $unitModel = new ModeloUnidad($this->db);
-        if (!$unitModel->getUnit($unidadId)) {
+        if (!$unitModel->obtenerUnidadPorId($unidadId)) {
             error_log("Validation failed: unidad_id {$unidadId} does not exist");
             return false;
         }
@@ -176,11 +176,40 @@ class ContentModel {
             return false;
         }
 
-        // Validar URL para tipos que la requieren
+        // ==================================================
+        // CORRECCIÓN: Validación de URL mejorada
+        // ==================================================
         if (in_array($tipo, ['documento', 'video', 'enlace', 'imagen']) && empty($url)) {
             error_log("Validation failed: URL required for tipo '{$tipo}'");
             return false;
         }
+
+        // Validar formato de URL si se proporciona
+        if ($url) {
+            // Primero, verificar si ya tiene protocolo
+            $originalUrl = $url;
+            
+            if (!preg_match('/^https?:\/\//', $url)) {
+                // Agregar https:// si no tiene protocolo
+                $url = 'https://' . $url;
+                error_log("URL sin protocolo detectada. Corregida a: {$url}");
+            }
+            
+            // Ahora validar con filter_var
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                error_log("Validation failed: Invalid URL format '{$originalUrl}' (corregida a '{$url}')");
+                
+                // Para YouTube, intentar un formato más permisivo
+                if (strpos($originalUrl, 'youtube.com') !== false || strpos($originalUrl, 'youtu.be') !== false) {
+                    error_log("URL de YouTube detectada, permitiendo formato especial");
+                    // Para YouTube, aceptamos incluso sin protocolo completo
+                    // El frontend ya debería haberlo corregido
+                } else {
+                    return false;
+                }
+            }
+        }
+        // ==================================================
 
         $stmt = $conn->prepare('INSERT INTO contenido_didactico (unidad_id, tema_id, tipo, titulo, contenido, url, orden) VALUES (?, ?, ?, ?, ?, ?, ?)');
         if (!$stmt) {
@@ -188,6 +217,7 @@ class ContentModel {
             return false;
         }
 
+        // Usar la URL corregida (con https:// si fue necesario)
         $stmt->bind_param('iissssi', $unidadId, $temaId, $tipo, $titulo, $contenido, $url, $orden);
         $res = $stmt->execute();
 
@@ -230,6 +260,31 @@ class ContentModel {
                         return false;
                     }
                 }
+
+                // ==================================================
+                // CORRECCIÓN: Validación de URL si se está actualizando
+                // ==================================================
+                if ($col === 'url' && $fields[$col] !== null && $fields[$col] !== '') {
+                    $url = $fields[$col];
+                    
+                    if (!preg_match('/^https?:\/\//', $url)) {
+                        // Agregar https:// si no tiene protocolo
+                        $fields[$col] = 'https://' . $url;
+                        $values[count($values) - 1] = $fields[$col]; // Actualizar el valor en el array
+                        error_log("URL sin protocolo detectada en update. Corregida a: {$fields[$col]}");
+                    }
+                    
+                    // Revalidar con filter_var
+                    if (!filter_var($fields[$col], FILTER_VALIDATE_URL)) {
+                        error_log("Update failed: Invalid URL format '{$url}' (corregida a '{$fields[$col]}')");
+                        
+                        // Permitir URLs de YouTube incluso si filter_var falla
+                        if (strpos($url, 'youtube.com') === false && strpos($url, 'youtu.be') === false) {
+                            return false;
+                        }
+                    }
+                }
+                // ==================================================
 
                 // Validar tema_id si se está actualizando
                 if ($col === 'tema_id') {

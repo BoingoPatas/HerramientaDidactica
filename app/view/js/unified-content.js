@@ -30,6 +30,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     let currentUnitId = null;
 
+    function validateAndFormatUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        
+        let formattedUrl = url.trim();
+        
+        // Asegurar protocolo
+        if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+            formattedUrl = 'https://' + formattedUrl;
+        }
+        
+        return formattedUrl;
+    }
+
     if (toggleVisibilidad) {
         toggleVisibilidad.addEventListener('change', async function() {
             // 1. Verificar qué trimestre tenemos seleccionado actualmente
@@ -65,58 +78,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Evento cuando cambias de trimestre
     if (trimestreSelector) {
-        trimestreSelector.addEventListener('change', async function() {
+        trimestreSelector.addEventListener('change', function() {
             const selectedTrimestre = this.value;
-            console.log('Cambiando al trimestre:', selectedTrimestre);
             
-            try {
-                // 1. Llamar al backend para obtener unidades y estado de visibilidad
-                const response = await fetch(`index.php?action=get_units_by_trimestre&trimestre=${selectedTrimestre}`);
-                const data = await response.json();
+            // Ocultar contenido previo para evitar "fantasmas" de unidades anteriores
+            if (unitContent) unitContent.classList.add('hidden');
+            if (noUnitSelected) noUnitSelected.classList.remove('hidden');
+            
+            loadUnitsByTrimestre(selectedTrimestre);
+        });
+    }
+
+    // Evento cuando seleccionas una unidad del dropdown (EL QUE CARGA EL CONTENIDO)
+    if (unitDropdown) {
+        unitDropdown.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const unitId = selectedOption.getAttribute('data-id'); 
+            
+            if (unitId) {
+                // Actualizar textos básicos
+                if (unitTitle) unitTitle.textContent = selectedOption.getAttribute('data-title');
+                if (unitDescription) unitDescription.textContent = selectedOption.getAttribute('data-description');
                 
-                if (data.success) {
-                    const msgBloqueado = document.getElementById('trimestre-bloqueado-msg');
-                    
-                    // 2. Limpiar y repoblar el unitDropdown
-                    if (unitDropdown) {
-                        unitDropdown.innerHTML = '<option value="">Seleccione una unidad...</option>';
-                        
-                        // Solo llenamos si hay unidades (o si es profesor, para que vea la lista vacía)
-                        if (data.units && data.units.length > 0) {
-                            data.units.forEach(u => {
-                                const option = document.createElement('option');
-                                option.value = u.id;
-                                option.textContent = u.titulo;
-                                unitDropdown.appendChild(option);
-                            });
-                        }
-                    }
-
-                    // 3. Lógica del Mensaje de Bloqueo (Solo para alumnos)
-                    if (msgBloqueado) {
-                        // isTeacher ya está definido al inicio de tu archivo unified-content.js
-                        if (!isTeacher && !data.isVisible) {
-                            msgBloqueado.classList.remove('hidden');
-                            if (unitDropdown) unitDropdown.classList.add('hidden'); 
-                        } else {
-                            msgBloqueado.classList.add('hidden');
-                            if (unitDropdown) unitDropdown.classList.remove('hidden');
-                        }
-                    }
-
-                    // 4. Actualizar el switch si eres docente
-                    const toggleVisibilidad = document.getElementById('toggle-trimestre-visibility');
-                    if (toggleVisibilidad) {
-                        toggleVisibilidad.checked = data.isVisible;
-                    }
-
-                    // 5. Resetear la vista de contenido
-                    if (unitContent) unitContent.classList.add('hidden');
-                    if (noUnitSelected) noUnitSelected.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error al cargar unidades del trimestre:", error);
+                // Mostrar los contenedores
+                unitContent.classList.remove('hidden');
+                noUnitSelected.classList.add('hidden');
+                
+                // --- LLAMADA CLAVE PARA CARGAR EL CONTENIDO REAL ---
+                loadUnitContent(unitId); 
+                
+                // Actualizar visual del switch de la unidad (🔓/🔒)
+                const isActive = parseInt(selectedOption.getAttribute('data-active')) === 1;
+                updateToggleButtonVisual(isActive);
             }
         });
     }
@@ -177,6 +172,64 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // --- 4. Funciones de API y Carga ---
+
+    /**
+ * Carga las unidades de un trimestre específico y actualiza la UI
+ * @param {string|number} trimestreId 
+ */
+    async function loadUnitsByTrimestre(trimestreId) {
+        if (!trimestreId) return;
+
+        try {
+            const response = await fetch(`index.php?action=get_units_by_trimestre&trimestre=${trimestreId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // 1. Limpiar y repoblar el dropdown
+                unitDropdown.innerHTML = '<option value="">-- Seleccione una unidad --</option>';
+                
+                if (data.units && data.units.length > 0) {
+                    data.units.forEach(u => {
+                        const option = document.createElement('option');
+                        option.value = u.slug; // Para la URL
+                        option.textContent = u.titulo;
+                        
+                        // METADATOS CRÍTICOS (Para que el sistema no se "rompa")
+                        option.setAttribute('data-id', u.id);
+                        option.setAttribute('data-title', u.titulo);
+                        option.setAttribute('data-description', u.descripcion || '');
+                        option.setAttribute('data-active', u.activo);
+                        
+                        unitDropdown.appendChild(option);
+                    });
+                }
+
+                // 2. Control de Visibilidad (Enfoque Inclusivo/Seguridad)
+                const isTeacher = document.body.getAttribute('data-rol') !== 'Usuario';
+                const msgBloqueado = document.getElementById('trimestre-bloqueado-msg');
+                const toggleVis = document.getElementById('toggle-trimestre-visibility');
+
+                if (!isTeacher) {
+                    // Lógica para Alumnos
+                    if (data.isVisible) {
+                        unitSelectionArea?.classList.remove('hidden');
+                        msgBloqueado?.classList.add('hidden');
+                    } else {
+                        unitSelectionArea?.classList.add('hidden');
+                        msgBloqueado?.classList.remove('hidden');
+                    }
+                } else {
+                    // Lógica para Docentes (El switch debe reflejar la BD)
+                    if (toggleVis) toggleVis.checked = data.isVisible;
+                }
+
+            } else {
+                console.error("Error del servidor:", data.message);
+            }
+        } catch (error) {
+            console.error("Error en la petición de unidades:", error);
+        }
+    }
     
     async function checkTopicHasEvaluation(topicId) {
         try {
@@ -1438,7 +1491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const type = document.getElementById('content-type').value;
         const title = document.getElementById('content-title').value.trim();
         const text = document.getElementById('content-text').value.trim();
-        const url = document.getElementById('content-url').value.trim();
+        let url = document.getElementById('content-url').value.trim();
         const topicId = document.getElementById('content-topic').value;
         const editingId = contentModal.dataset.editingId;
 
@@ -1450,8 +1503,29 @@ document.addEventListener('DOMContentLoaded', function() {
             return showNotification('El contenido de texto no puede estar vacío', 'error');
         }
         
-        if (type !== 'texto' && !url) {
-            return showNotification('La URL es obligatoria para este tipo de contenido', 'error');
+        if (type !== 'texto') {
+            if (!url) {
+                return showNotification('La URL es obligatoria para este tipo de contenido', 'error');
+            }
+            
+        // ==========================================================
+        // CORRECCIÓN: Usar la función validateAndFormatUrl
+        // ==========================================================
+            url = validateAndFormatUrl(url);
+            
+            // Validar formato de URL
+            try {
+                new URL(url);
+                console.log('URL válida:', url);
+            } catch (e) {
+                console.error('URL inválida:', url, 'Error:', e);
+                // Para YouTube, ser más permisivo
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    console.log('URL de YouTube detectada, permitiendo formato especial');
+                } else {
+                    return showNotification('URL inválida. Ejemplo: https://www.youtube.com/watch?v=...', 'error');
+                }
+            }
         }
 
         const body = {
@@ -1460,26 +1534,75 @@ document.addEventListener('DOMContentLoaded', function() {
             tipo: type,
             titulo: title,
             contenido: text,
-            url: url,
-            tema_id: topicId || null
+            url: url,  // URL ya corregida
+            tema_id: topicId || null,
+            orden: 0
         };
 
         const method = editingId ? 'PUT' : 'POST';
-        const payload = editingId ? { id: editingId, fields: body, csrf_token: csrfToken } : body;
+        const payload = editingId ? { 
+            id: editingId, 
+            fields: body, 
+            csrf_token: csrfToken 
+        } : body;
+
+        console.log('Enviando payload a content_api:', payload);
 
         try {
             const response = await fetch('index.php?action=content_api', {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
                 body: JSON.stringify(payload)
             });
-            const data = await response.json();
+            
+            // ==================================================
+            // CORRECCIÓN: Manejo mejorado de respuesta
+            // ==================================================
+            // Obtener respuesta como texto primero
+            const responseText = await response.text();
+            console.log('Respuesta recibida (texto):', responseText.substring(0, 200) + '...');
+            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (jsonError) {
+                console.error('Error parseando JSON:', jsonError);
+                console.error('Respuesta cruda completa:', responseText);
+                
+                // Si la respuesta contiene error PHP, mostrarlo
+                if (responseText.includes('Fatal error') || responseText.includes('Parse error')) {
+                    showNotification('Error PHP en el servidor. Revisa los logs.', 'error');
+                } else {
+                    showNotification('El servidor devolvió una respuesta no válida.', 'error');
+                }
+                return;
+            }
+            
+            // Verificar si la respuesta indica éxito
             if (data.success) {
                 contentModal.classList.add('hidden');
                 loadUnitContent(currentUnitId);
-                showNotification('Contenido guardado');
+                showNotification('Contenido guardado exitosamente');
+            } else {
+                // Mostrar el error específico del servidor
+                const errorMsg = data.error || 'Error desconocido al guardar';
+                console.error('Error del servidor:', errorMsg);
+                showNotification('Error: ' + errorMsg, 'error');
             }
-        } catch { showNotification('Error de conexión', 'error'); }
+            } catch (error) { 
+        console.error('Error completo en la petición:', error);
+        console.error('URL enviada:', url);
+        console.error('Payload completo:', payload);
+        
+        // Mostrar error más específico
+        if (error.message.includes('JSON')) {
+            showNotification('Error: El servidor devolvió una respuesta inválida', 'error');
+        } else if (error.message.includes('Network')) {
+            showNotification('Error de red. Verifica tu conexión.', 'error');
+        } else {
+            showNotification('Error: ' + error.message, 'error');
+        }
+    }
     });
 
     document.querySelectorAll('.mg-modal-overlay, .modal').forEach(modal => {
@@ -1744,5 +1867,47 @@ document.addEventListener('click', function(e) {
                 }
             });
     }
+
+    // Al final del DOMContentLoaded
+    (function initializePage() {
+        const initTrimestre = trimestreSelector ? trimestreSelector.value : "1";
+        if (initTrimestre) {
+            console.log('Iniciando carga automática para trimestre:', initTrimestre);
+            loadUnitsByTrimestre(initTrimestre);
+        }
+    })();
+
+    // Verifica si tienes este bloque para que al elegir la unidad se cargue el contenido
+    if (unitDropdown) {
+        unitDropdown.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const unitId = selectedOption.getAttribute('data-id'); // Ahora sí existirá gracias a tus cambios
+            
+            if (unitId) {
+                // Actualizar UI básica
+                unitTitle.textContent = selectedOption.getAttribute('data-title');
+                unitDescription.textContent = selectedOption.getAttribute('data-description');
+                
+                // Mostrar contenedores
+                unitContent.classList.remove('hidden');
+                noUnitSelected.classList.add('hidden');
+                
+                // CARGAR EL CONTENIDO REAL (Temas, archivos, etc)
+                loadUnitContent(unitId); 
+                
+                // Actualizar el botón de candado (🔓/🔒)
+                const isActive = parseInt(selectedOption.getAttribute('data-active')) === 1;
+                updateToggleButtonVisual(isActive);
+            } else {
+                unitContent.classList.add('hidden');
+                noUnitSelected.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Inicialización automática al cargar la página
+    const initTrimestre = trimestreSelector ? trimestreSelector.value : "1";
+    console.log('🚀 Inicializando sistema en Trimestre:', initTrimestre);
+    loadUnitsByTrimestre(initTrimestre);
 
 });

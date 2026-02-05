@@ -480,4 +480,22 @@ class ModeloUnidad {
         // Por defecto, si no existe el registro, asumimos que está activo (1)
         return $result ? (bool)$result['activo'] : true;
     }
+
+    // En ModeloUnidad.php, agregar:
+    public function updateUnitActiveStatus($unitId, $activo) {
+        try {
+            $query = "UPDATE unidades SET activo = ? WHERE id = ?";
+            $stmt = $this->db->conn->prepare($query);
+            $stmt->bind_param('ii', $activo, $unitId);
+            $success = $stmt->execute();
+            $stmt->close();
+            return $success;
+        } catch (Exception $e) {
+            error_log("Error al actualizar estado de unidad: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
+
+

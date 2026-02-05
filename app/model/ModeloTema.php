@@ -113,7 +113,7 @@ class ModeloTema {
         // Validar que la unidad existe
         require_once __DIR__ . '/ModeloUnidad.php';
         $unitModel = new ModeloUnidad($this->db);
-        if (!$unitModel->getUnit($unidadId)) {
+        if (!$unitModel->obtenerUnidadPorId($unidadId)) {
             error_log("Validation failed: unidad_id {$unidadId} does not exist");
             return false;
         }
