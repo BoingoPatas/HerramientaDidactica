@@ -1,0 +1,874 @@
+/* app/view/css/content-view.css - Estilos específicos para la vista de contenido */
+
+/* Estilos para el modal de ejercicios con CSS Grid */
+.exercise-modal-grid {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.exercise-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Estilo para el campo de slug como subtítulo */
+.slug-display {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #6c757d;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+#exercise-error, #evaluation-error, #topic-error {
+    grid-column: span 2;
+    padding: 10px;
+    background: #f8d7da;
+    color: #721c24;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .exercise-form-grid, .evaluation-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .exercise-modal-grid, .evaluation-modal-grid {
+        width: 95%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .mg-modal-title {
+        font-size: 18px !important;
+    }
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+}
+
+/* Estilos para la sección de temas en material teórico */
+.topics-in-theory-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.topics-in-theory-section h4 {
+    margin-top: 0;
+    color: #495057;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.theory-topics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.theory-topic-item {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.theory-topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.theory-topic-header h5 {
+    margin: 0;
+    color: #212529;
+    font-size: 16px;
+}
+
+.theory-topic-description {
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.theory-topic-exercises {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+}
+
+.theory-topic-exercises h6 {
+    margin: 0 0 8px 0;
+    color: #495057;
+    font-size: 14px;
+}
+
+.theory-topic-exercises ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.theory-topic-exercises li {
+    margin-bottom: 5px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Estilos para la sección unificada de contenido */
+.unified-theory-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.unified-theory-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.unified-theory-section h3 {
+    margin: 0;
+    color: #495057;
+    font-size: 20px;
+}
+
+.teacher-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.general-theory-material {
+    margin-bottom: 30px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.unified-topics-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.unified-topic-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.unified-topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.unified-topic-header h4 {
+    margin: 0;
+    color: #212529;
+    font-size: 18px;
+}
+
+.unified-topic-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Estilos para advertencias de temas sin evaluaciones */
+.topic-missing-evaluation {
+    border-left: 4px solid #dc3545 !important;
+    background-color: #fff5f5 !important;
+}
+
+.topic-missing-evaluation .topic-warning {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topic-missing-evaluation .topic-warning .warning-icon {
+    font-size: 18px;
+}
+
+/* Estilos para elementos deshabilitados */
+.disabled-item {
+    opacity: 0.6;
+    position: relative;
+    border-left: 4px solid #6c757d !important;
+    background-color: #f8f9fa !important;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Permitir interacción con botones de acción y enlaces para Docentes/Administradores */
+body[data-rol="Docente"] .disabled-item,
+body[data-rol="Administrador"] .disabled-item {
+    cursor: default;
+}
+
+body[data-rol="Docente"] .disabled-item .unified-topic-actions,
+body[data-rol="Administrador"] .disabled-item .unified-topic-actions,
+body[data-rol="Docente"] .disabled-item .exercise-actions,
+body[data-rol="Administrador"] .disabled-item .exercise-actions,
+body[data-rol="Docente"] .disabled-item .content-actions,
+body[data-rol="Administrador"] .disabled-item .content-actions,
+body[data-rol="Docente"] .disabled-item .exercise-link,
+body[data-rol="Administrador"] .disabled-item .exercise-link,
+body[data-rol="Docente"] .disabled-item .video-link,
+body[data-rol="Administrador"] .disabled-item .video-link {
+    pointer-events: auto;
+}
+
+.disabled-item::after {
+    content: "🔒 Deshabilitado";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #6c757d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.disabled-badge {
+    background: #6c757d;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.disabled-actions {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.disabled-actions .btn {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+}
+
+.disabled-actions .btn:hover {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    transform: none !important;
+}
+
+/* Estilos para el modal de evaluaciones */
+.evaluation-modal-grid {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.evaluation-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.unified-topic-description {
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.topic-theory-content {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.topic-exercises-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.topic-exercises-section h5 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 16px;
+}
+
+.exercise-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.exercise-link {
+    display: block;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    color: #212529;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-size: 14px;
+    position: relative;
+}
+
+.exercise-link:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.exercise-link:active {
+    transform: translateY(0);
+}
+
+.exercise-link .exercise-type-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.exercise-practica {
+    border-left: 4px solid #28a745;
+}
+
+.exercise-practica .exercise-type-badge {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.exercise-evaluacion {
+    border-left: 4px solid #007bff;
+}
+
+.exercise-evaluacion .exercise-type-badge {
+    background: #cce5ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+/* Estilos para la sección de videos - similar a ejercicios */
+.topic-videos-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.topic-videos-section h5 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 16px;
+}
+
+.video-links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.video-link {
+    display: block;
+    padding: 10px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    color: #212529;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    font-size: 14px;
+    position: relative;
+}
+
+.video-link:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.video-link:active {
+    transform: translateY(0);
+}
+
+.video-link .video-type-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.video-link {
+    border-left: 4px solid #dc3545; /* Color rojo para videos */
+}
+
+.video-link .video-type-badge {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estilos para contenido integrado dentro de temas */
+.content-item {
+    margin: 15px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.content-item h4 {
+    margin: 0 0 10px 0;
+    color: #212529;
+    font-size: 16px;
+}
+
+.content-text {
+    color: #495057;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.content-description {
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.content-link {
+    margin-top: 10px;
+}
+
+.content-title-button {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.content-title-button:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.external-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.external-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.content-type-badge-inline {
+    font-size: 12px;
+    color: #6c757d;
+    margin-left: 8px;
+}
+
+/* Estilos para acciones de contenido (editar/eliminar) */
+.content-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.content-actions .btn-edit {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #495057;
+}
+
+.content-actions .btn-delete {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.content-actions .btn-edit:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+}
+
+.content-actions .btn-delete:hover {
+    background: #f1b0b7;
+    border-color: #e89fa5;
+}
+
+/* Estilos para el modal de confirmación */
+.confirmation-message {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.5;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Asegurar que el modal de confirmación siga el mismo patrón visual que otros modales */
+#confirmation-modal .mg-modal-title {
+    color: var(--primary);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    text-align: center;
+}
+
+#confirmation-modal .mg-modal-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 2px;
+}
+
+#confirmation-modal .mg-modal-actions {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    margin-top: 2.5rem;
+}
+
+#confirmation-modal .btn {
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: -0.25px;
+    min-width: 120px;
+    text-align: center;
+}
+
+#confirmation-modal .btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
+}
+
+#confirmation-modal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+}
+
+#confirmation-modal .btn-secondary {
+    background: rgba(255,255,255,0.9);
+    color: var(--text);
+    border: 2px solid var(--border);
+    backdrop-filter: blur(4px);
+}
+
+#confirmation-modal .btn-secondary:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--panel);
+    transform: translateY(-1px);
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA EL MODAL DE ORDENAMIENTO (showOrderModal) --- */
+
+.order-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    gap: 12px;
+}
+
+.order-item.current {
+    background: #e7f3ff;
+    border-color: #74b9ff;
+}
+
+.order-number {
+    font-weight: bold;
+    color: #0984e3;
+    width: 25px;
+}
+
+.order-name {
+    flex-grow: 1;
+}
+
+.btn-move-here {
+    padding: 4px 8px;
+    font-size: 0.85em;
+}
+
+/* Asegurar estilo del botón secundario para las flechas de ordenamiento */
+.order-controls .btn-secondary {
+    background-color: #f3f4f6; /* Gris claro */
+    color: #374151; /* Texto gris oscuro */
+    border: 1px solid #d1d5db;
+    flex-grow: 1; /* Para que ocupen el mismo ancho en el flex */
+    font-weight: 600;
+    transition: all 0.2s ease;
+    padding: 10px 15px; /* Ajustar padding para mejor aspecto */
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.order-controls .btn-secondary:hover:not(:disabled) {
+    background-color: #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Estilo para el estado deshabilitado */
+.btn-disabled, .btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+    pointer-events: none; /* Asegura que no se disparen eventos de clic */
+}
+
+/* Estilo para el contenedor de controles */
+.order-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Estilos para el mensaje de bloqueo */
+#trimestre-bloqueado-msg {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ffeeba;
+    margin-top: 15px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* El Switch del Docente */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider { background-color: #28a745; }
+input:checked + .slider:before { transform: translateX(14px); }
+
+/* CLASE CRÍTICA: Asegúrate de que esto esté para que el JS pueda ocultar elementos */
+.hidden {
+    display: none !important;
+}
+
+/* Contenedor que envuelve el selector de trimestre y el switch */
+.trimestre-filter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: flex-start; /* Alinea todo a la izquierda */
+}
+
+/* Ajuste para que el switch y su texto no se mezclen con iconos de arriba */
+.trimestre-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.03); /* Un fondo sutil para separarlo visualmente */
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+/* Si el emoji de target está en un label o span específico, 
+   aseguramos que tenga su bloque de espacio */
+.content-selector label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Mensaje de Bloqueo Estilo GNOME/Clean */
+#trimestre-bloqueado-msg {
+    background-color: #f8d7da; /* Un rojo/rosa muy suave */
+    color: #721c24;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #f5c6cb;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#trimestre-bloqueado-msg i {
+    font-size: 2.5rem;
+    color: #dc3545;
+    margin-bottom: 5px;
+}
+
+/* Ajuste del área de unidades para que no deje huecos */
+#unit-selection-area.hidden, 
+#trimestre-bloqueado-msg.hidden {
+    display: none !important;
+}
